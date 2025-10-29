@@ -1,3 +1,5 @@
+#By Raghav Bhargava (2023UCA1927) and Akshansh Kumar Gautam (2023UCA1881)
+
 Introduction -:
 This project detects and classifies plastic waste in images using OpenAI’s CLIP model combined with Selective Search for region proposals and Tesseract OCR for reading recyclable labels (e.g., PET, HDPE, etc.).
 It performs open-vocabulary object detection — meaning it can identify new object categories using only text prompts, without retraining.
