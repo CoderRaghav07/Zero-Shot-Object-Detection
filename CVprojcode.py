@@ -7,11 +7,9 @@ from PIL import Image, ImageDraw, ImageFont
 import torch
 import clip
 
-# Paths
 os.environ["XDG_CACHE_HOME"] = "C:/Users/Raghav Bhargava/Downloads/clip_cache"
 pytesseract.pytesseract.tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
 
-# ---------------------- OCR FUNCTION ----------------------
 def run_ocr(pil_img, min_confidence=60):
     np_img = np.array(pil_img)
     data = pytesseract.image_to_data(np_img, output_type=pytesseract.Output.DICT)
@@ -38,8 +36,6 @@ def run_ocr(pil_img, min_confidence=60):
             })
     return tokens
 
-
-# ---------------------- NON-MAX SUPPRESSION ----------------------
 def non_max_suppression(detections, iou_threshold=0.4):
     if not detections:
         return []
@@ -71,17 +67,14 @@ def non_max_suppression(detections, iou_threshold=0.4):
 
     return [detections[i] for i in keep]
 
-
-# ---------------------- ZERO SHOT DETECTION FUNCTION ----------------------
-def detect_open_vocab(image_path, class_prompts, device="cpu",
-                      max_props=200, clip_model_name="ViT-B/32", base_threshold=0.75):
+def detect_open_vocab(image_path, class_prompts, device="cpu", max_props=200, clip_model_name="ViT-B/32", base_threshold=0.75):
 
     start_time = time.time()
-    print(f"[INFO] Loading image: {image_path}")
+    print(f"Loading image: {image_path}")
     pil_img = Image.open(image_path).convert("RGB")
     np_img = np.array(pil_img)
 
-    print(f"[INFO] Loading CLIP model: {clip_model_name}")
+    print(f"Loading CLIP model: {clip_model_name}")
     model, preprocess = clip.load(clip_model_name, device=device)
 
     text_tokens = clip.tokenize(class_prompts).to(device)
@@ -89,7 +82,7 @@ def detect_open_vocab(image_path, class_prompts, device="cpu",
         text_features = model.encode_text(text_tokens)
         text_features /= text_features.norm(dim=-1, keepdim=True)
 
-    print("[INFO] Generating region proposals...")
+    print("Generating region proposals...")
     ss = cv2.ximgproc.segmentation.createSelectiveSearchSegmentation()
     ss.setBaseImage(cv2.cvtColor(np_img, cv2.COLOR_RGB2BGR))
     ss.switchToSelectiveSearchFast()
@@ -127,18 +120,16 @@ def detect_open_vocab(image_path, class_prompts, device="cpu",
     else:
         threshold = base_threshold
 
-    print(f"[INFO] Dynamic threshold set to: {threshold:.2f}")
+    print(f"Dynamic threshold set to: {threshold:.2f}")
     detections = [d for d in detections if d["score"] >= threshold]
     detections = non_max_suppression(detections, iou_threshold=0.4)
 
     elapsed = time.time() - start_time
     fps = 1 / elapsed if elapsed > 0 else 0
-    print(f"[INFO] Processing time: {elapsed:.2f}s ({fps:.2f} FPS)")
+    print(f"Processing time: {elapsed:.2f}s ({fps:.2f} FPS)")
 
     return np_img, detections, run_ocr(pil_img, min_confidence=60)
 
-
-# ---------------------- RECYCLABILITY CHECK ----------------------
 def classify_recyclability(ocr_tokens):
     recyclable = []
     for token in ocr_tokens:
@@ -147,8 +138,6 @@ def classify_recyclability(ocr_tokens):
             recyclable.append(text)
     return recyclable
 
-
-# ---------------------- MAIN DEMO FUNCTION ----------------------
 def demo(args):
     class_prompts = ["Plastic bottle", "crumpled plastic wrapper", "plastic cup", "recycle bin"]
 
@@ -159,7 +148,7 @@ def demo(args):
     )
 
     recyclable_items = classify_recyclability(ocr_tokens)
-    print(f"[INFO] Recyclable items detected (based on OCR): {recyclable_items}")
+    print(f"Recyclable items detected (based on OCR): {recyclable_items}")
 
     pil_img = Image.fromarray(img)
     draw = ImageDraw.Draw(pil_img)
@@ -195,11 +184,10 @@ def demo(args):
     out_path = "result_final.jpg"
     pil_img.save(out_path)
 
-    print(f"[RESULT] Saved annotated image to {out_path}")
-    print(f"[STATS] Total detections: {len(detections)} | OCR tokens: {len(ocr_tokens)} | Recyclable tags found: {len(recyclable_items)}")
+    print(f"Saved annotated image to {out_path}")
+    print(f"Total detections: {len(detections)} | OCR tokens: {len(ocr_tokens)} | Recyclable tags found: {len(recyclable_items)}")
 
 
-# ---------------------- ARGPARSE ENTRY ----------------------
 if __name__ == "__main__":
     import argparse
     parser = argparse.ArgumentParser()
