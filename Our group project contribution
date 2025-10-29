@@ -1,0 +1,42 @@
+While the paper “Analysis of using Zero-Shot Open Vocabulary Detection Methods for Plastic Waste Classification” focused on comparing existing large models (ViLD, OWL-ViT, Grounding DINO, YOLO-World), my work implements a lightweight and deployable alternative using CLIP-based Zero-Shot Detection integrated with OCR.
+
+In this YOLO World, it requires labeled data so that it can detect data and then classify it . Its drawbacks are :-
+1. Models like real life problems like autonomous plastic waste classification datasets are huge making model bulky making it difficult to detect and classify objects
+2. Limited Generalization – YOLO models rely on fixed, pre-trained class labels. Therefore, they can only detect limited and specific object categories present in their training data and fail to recognize unseen plastic types or packaging variations.
+
+To overcome the problem my group and I have made zero shot object detection, where in the code we have libraries import cv2, NumPy, pytesseract, PIL, CLIP, torch. We used CLIP (Contrastive Language Image Pretrained) model where it starts with detecting areas of objects in an image and then for each region it detects similar patterns to get an image with respect to prompts and it checks with dynamic threshold values and after that it uses tesseract which acts as an OCR (Optical Character Recognition) tool that draws detection box and text box on output box (result).
+
+Our Contributions in the project:
+
+Practical Integration of CLIP + OCR -
+The system not only detects unseen waste items using text prompts (zero-shot detection) but it also reads printed information such as recycling codes or labels (e.g., “PET 1”, “HDPE 2”) directly from packaging.
+
+Dynamic Thresholding & Non-Max Suppression -
+Implemented adaptive thresholding based on detection confidence and NMS filtering to enhance precision in real-time waste streams.
+
+Recyclability Classification -
+Added logic to automatically categorize items as recyclable or non-recyclable based on OCR-extracted text, bridging the gap between object detection and material understanding.
+
+Industrial Readiness Testing -
+Measured processing time and frames-per-second (FPS) to assess deployment feasibility on edge or embedded hardware for smart waste management systems.
+
+Visual Explainability -
+The annotated image output clearly marks detected items and OCR text regions, improving interpretability for human operators or robotic controllers.
+
+Together, these features make the model simpler, faster, and more adaptable to industrial recycling environments compared with the large-scale architectures analyzed in the paper.
+
+Future Scope:
+1) Edge Detection - Quantize or convert the CLIP model to ONNX/TensorRT for use on low-power boards (Jetson Nano, Raspberry Pi).
+Benefits - Enables on-site real time detection in smart bins and sorting lines 
+ 
+2) Dataset Expansion - Generate synthetic plastic-waste images using augmentation or diffusion models.
+Benefits - Improves accuracy and robustness under varied lighting and clutter.
+
+3) Multi-Modal Fusion - Combine vision + text + sensor data (weight, IR spectrum).
+Benefits - Better identification of mixed or transparent plastics.
+
+4) Active Learning Loop - Collect misclassified samples to refine prompts or fine-tune embeddings automatically.
+Benefits - Model continuously improves with new data.
+
+5)IoT & Robotics Integration - Link detection output with actuators or conveyors via MQTT/API.
+Benefits - Enables fully automated waste sorting systems.
